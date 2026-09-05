@@ -1,15 +1,15 @@
-import { toStaticAssetPath, syncAssetToPublic } from '../utils/paths.js';
+import { toStaticAssetPath, syncAssetToPublic } from '../utils/paths';
 import {
   CompositionPropsSchema,
   type CompositionProps,
   type Scene,
   type Word,
-} from '../../remotion/schema.js';
+} from '../../remotion/schema';
 import type {
   EditDecisionList,
   AudioTimeline,
   AssetCatalog,
-} from './schemas.js';
+} from './schemas';
 
 export interface ComposeInput {
   jobId: string;

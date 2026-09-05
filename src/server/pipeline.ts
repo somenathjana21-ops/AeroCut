@@ -1,11 +1,11 @@
-import { jobQueue } from './queue/JobQueue.js';
-import { ingestionAgent } from './agents/IngestionAgent.js';
-import { narrativeAgent } from './agents/NarrativeAgent.js';
-import { audioAgent } from './agents/AudioAgent.js';
-import { compositionAgent } from './agents/CompositionAgent.js';
-import { renderAgent } from './agents/RenderAgent.js';
-import type { EditDecisionList, AudioTimeline } from './agents/schemas.js';
-import type { CompositionProps } from '../remotion/schema.js';
+import { jobQueue } from './queue/JobQueue';
+import { ingestionAgent } from './agents/IngestionAgent';
+import { narrativeAgent } from './agents/NarrativeAgent';
+import { audioAgent } from './agents/AudioAgent';
+import { compositionAgent } from './agents/CompositionAgent';
+import { renderAgent } from './agents/RenderAgent';
+import type { EditDecisionList, AudioTimeline } from './agents/schemas';
+import type { CompositionProps } from '../remotion/schema';
 
 export interface PipelineOptions {
   sourceScript?: string;
@@ -43,7 +43,16 @@ export async function runPipeline(
 
   let currentStage = 'INGESTION';
 
+  function assertNotCancelled() {
+    const current = jobQueue.getJob(jobId);
+    if (current?.status === 'CANCELLED') {
+      throw new Error('JOB_CANCELLED');
+    }
+  }
+
   try {
+    assertNotCancelled();
+
     // -------------------------------------------------------------------------
     // Stage 1: Ingestion
     // -------------------------------------------------------------------------
@@ -57,6 +66,8 @@ export async function runPipeline(
       `Ingestion completed: catalog contains ${catalog.assets.length} media assets`
     );
 
+    assertNotCancelled();
+
     // -------------------------------------------------------------------------
     // Stage 2: Narrative Director (PLANNING)
     // -------------------------------------------------------------------------
@@ -66,12 +77,56 @@ export async function runPipeline(
       message: `Planning narrative structure for "${job.prompt.slice(0, 50)}..." in ${job.mode} mode`,
     });
 
-    const edl = await narrativeAgent.plan({
-      taskPrompt: job.prompt,
-      mode: job.mode,
-      catalog,
-      sourceScript: options?.sourceScript,
-    });
+    jobQueue.logEvent(
+      jobId,
+      'PLANNING',
+      'info',
+      `Analyzing prompt constraints for ${job.mode} mode (${catalog.assets.length} assets available)...`
+    );
+    jobQueue.logEvent(
+      jobId,
+      'PLANNING',
+      'info',
+      'Invoking Gemini Narrative Director to plan hook and beat structure...'
+    );
+
+    let elapsedSec = 0;
+    const planningHeartbeat = setInterval(() => {
+      elapsedSec += 4;
+      const current = jobQueue.getJob(jobId);
+      if (current?.status !== 'PLANNING') {
+        clearInterval(planningHeartbeat);
+        return;
+      }
+      jobQueue.logEvent(
+        jobId,
+        'PLANNING',
+        'info',
+        `Narrative Director structuring scenes and pacing (${elapsedSec}s elapsed)...`
+      );
+    }, 4000);
+
+    let edl;
+    try {
+      edl = await narrativeAgent.plan({
+        taskPrompt: job.prompt,
+        mode: job.mode,
+        catalog,
+        sourceScript: options?.sourceScript,
+      });
+    } finally {
+      clearInterval(planningHeartbeat);
+    }
+
+    assertNotCancelled();
+
+    const plannedDuration = edl.beats.reduce((s, b) => s + b.estimatedDurationSec, 0);
+    jobQueue.logEvent(
+      jobId,
+      'PLANNING',
+      'info',
+      `Narrative plan finalized: ${edl.beats.length} beats, target duration ${plannedDuration.toFixed(1)}s`
+    );
 
     const edlJson = JSON.stringify(edl, null, 2);
 
@@ -85,6 +140,13 @@ export async function runPipeline(
       edlJson,
     });
 
+    jobQueue.logEvent(
+      jobId,
+      'SYNTHESIZING',
+      'info',
+      `Synthesizing ${edl.beats.length} voiceover segments with voice "${job.voice || 'default'}" and generating Whisper word timestamps...`
+    );
+
     const audioTimeline = await audioAgent.buildTimeline({
       jobId,
       edl,
@@ -92,6 +154,15 @@ export async function runPipeline(
       voice: job.voice,
       onEvent: (level, msg) => jobQueue.logEvent(jobId, 'SYNTHESIZING', level, msg),
     });
+
+    assertNotCancelled();
+
+    jobQueue.logEvent(
+      jobId,
+      'SYNTHESIZING',
+      'info',
+      `Audio timeline constructed: duration ${audioTimeline.totalDurationSec.toFixed(2)}s with ducking envelope`
+    );
 
     const audioTimelineJson = JSON.stringify(audioTimeline, null, 2);
 
@@ -105,12 +176,28 @@ export async function runPipeline(
       audioTimelineJson,
     });
 
+    jobQueue.logEvent(
+      jobId,
+      'COMPOSING',
+      'info',
+      `Mapping ${edl.beats.length} narrative scenes to integer frame boundaries and calculating Ken Burns camera motion...`
+    );
+
     const props = compositionAgent.compose({
       jobId,
       edl,
       audioTimeline,
       catalog,
     });
+
+    assertNotCancelled();
+
+    jobQueue.logEvent(
+      jobId,
+      'COMPOSING',
+      'info',
+      `Composition props validated: ${props.durationInFrames} frames (${(props.durationInFrames / props.fps).toFixed(1)}s) at ${props.fps}fps, ${props.width}x${props.height}`
+    );
 
     const propsJson = JSON.stringify(props, null, 2);
 
@@ -124,11 +211,20 @@ export async function runPipeline(
       propsJson,
     });
 
+    jobQueue.logEvent(
+      jobId,
+      'RENDERING',
+      'info',
+      `Bundling Remotion project and starting hardware-accelerated render (${props.durationInFrames} frames)...`
+    );
+
     const renderResult = await renderAgent.render(
       jobId,
       props,
       (progress) => options?.onProgress?.(progress)
     );
+
+    assertNotCancelled();
 
     // -------------------------------------------------------------------------
     // Completion
@@ -149,6 +245,14 @@ export async function runPipeline(
       props,
     };
   } catch (err: any) {
+    if (err.message === 'JOB_CANCELLED' || jobQueue.getJob(jobId)?.status === 'CANCELLED') {
+      console.log(`[Pipeline] Job ${jobId} was cancelled by user during stage ${currentStage}`);
+      return {
+        jobId,
+        status: 'CANCELLED',
+      } as any;
+    }
+
     console.error(`[Pipeline] Pipeline failure at stage ${currentStage} for job ${jobId}:`, err);
     jobQueue.failJob(jobId, currentStage, err);
     throw err;

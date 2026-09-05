@@ -1,4 +1,12 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  serverExternalPackages: [
+    'better-sqlite3',
+    '@remotion/renderer',
+    '@remotion/bundler',
+    'esbuild',
+  ],
+};
 
 export default nextConfig;
+

@@ -1,15 +1,15 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execa } from 'execa';
-import { runPython } from '../utils/python-runner.js';
-import { toStaticAssetPath, syncAssetToPublic, PROCESSED_DIR } from '../utils/paths.js';
+import { runPython } from '../utils/python-runner';
+import { toStaticAssetPath, syncAssetToPublic, PROCESSED_DIR } from '../utils/paths';
 import {
   AudioTimelineSchema,
   type AudioTimeline,
   type EditDecisionList,
   type AssetCatalog,
   type Word,
-} from './schemas.js';
+} from './schemas';
 
 interface TtsResponse {
   outputPath: string;

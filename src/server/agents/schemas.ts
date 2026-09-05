@@ -6,7 +6,7 @@ export {
   type Word,
   type Scene,
   type CompositionProps,
-} from '../../remotion/schema.js';
+} from '../../remotion/schema';
 
 // ---------------------------------------------------------------------------
 // Agent 1: Ingestion Schemas

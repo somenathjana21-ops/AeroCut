@@ -4,14 +4,14 @@ import os from 'node:os';
 import { bundle } from '@remotion/bundler';
 import { selectComposition, renderMedia } from '@remotion/renderer';
 import { execa } from 'execa';
-import { wsHub } from '../ws/hub.js';
+import { wsHub } from '../ws/hub';
 import {
   OUTPUT_DIR,
   LOGS_DIR,
   PUBLIC_DIR,
   ensureDirectories,
-} from '../utils/paths.js';
-import type { CompositionProps } from '../../remotion/schema.js';
+} from '../utils/paths';
+import type { CompositionProps } from '../../remotion/schema';
 
 export interface RenderResult {
   outputPath: string;

@@ -1,24 +1,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { probeMedia } from '../utils/ffprobe.js';
+import { probeMedia } from '../utils/ffprobe';
 import {
   RAW_ASSETS_DIR,
   LIBRARY_DIR,
   ensureDirectories,
-} from '../utils/paths.js';
+} from '../utils/paths';
 import {
   upsertAsset,
   getAssetByPath,
   type AssetRecord,
-} from '../db/index.js';
+} from '../db/index';
 import {
   AssetSchema,
   AssetCatalogSchema,
   type Asset,
   type AssetCatalog,
   type AssetTag,
-} from './schemas.js';
+} from './schemas';
 
 const SUPPORTED_EXTENSIONS = new Set([
   // Video

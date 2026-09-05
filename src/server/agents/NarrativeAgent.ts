@@ -1,9 +1,9 @@
-import { generateStructured } from '../llm/client.js';
+import { generateStructured } from '../llm/client';
 import {
   EDLSchema,
   type EditDecisionList,
   type AssetCatalog,
-} from './schemas.js';
+} from './schemas';
 
 export const NARRATIVE_DIRECTOR_SYSTEM_PROMPT = `You are the Narrative Director for an automated video pipeline.
 

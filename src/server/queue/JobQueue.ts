@@ -11,8 +11,8 @@ import {
   listJobs,
   type JobRecord,
   type JobStatus,
-} from '../db/index.js';
-import { wsHub } from '../ws/hub.js';
+} from '../db/index';
+import { wsHub } from '../ws/hub';
 
 export interface EnqueueJobInput {
   prompt: string;
@@ -140,13 +140,35 @@ export class JobQueue {
   }
 
   /**
+   * Cancels an active job, records cancellation event, and broadcasts status.
+   */
+  public cancelJob(jobId: string): boolean {
+    const current = getJob(jobId);
+    if (!current) return false;
+
+    if (current.status === 'COMPLETE' || current.status === 'FAILED' || current.status === 'CANCELLED') {
+      return false;
+    }
+
+    this.transition(jobId, 'CANCELLED', {
+      message: 'Job cancelled by user',
+    });
+    return true;
+  }
+
+  /**
    * Fails a job with error details, persists to SQLite, and broadcasts job:failed.
    */
   public failJob(jobId: string, stage: string, error: Error | string): void {
     const errorMessage = typeof error === 'string' ? error : error.message;
     const current = getJob(jobId);
 
-    if (current && current.status !== 'FAILED' && current.status !== 'COMPLETE') {
+    if (
+      current &&
+      current.status !== 'FAILED' &&
+      current.status !== 'COMPLETE' &&
+      current.status !== 'CANCELLED'
+    ) {
       updateJobStatus(jobId, 'FAILED', errorMessage);
 
       insertJobEvent({

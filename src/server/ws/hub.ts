@@ -1,7 +1,17 @@
 import { WebSocket, WebSocketServer } from 'ws';
 
+export type TelemetryMessageType =
+  | 'job:status'
+  | 'job:event'
+  | 'render:progress'
+  | 'assets:updated'
+  | 'job:created'
+  | 'job:failed'
+  | 'ping'
+  | 'pong';
+
 export interface TelemetryEvent {
-  type: string;
+  type: TelemetryMessageType | string;
   jobId?: string;
   [key: string]: any;
 }
@@ -11,6 +21,7 @@ class WebSocketHub {
   private server: WebSocketServer | null = null;
   private uplinkSocket: WebSocket | null = null;
   private uplinkConnecting = false;
+  private pendingQueue: string[] = [];
 
   public registerServer(wss: WebSocketServer): void {
     this.server = wss;
@@ -35,28 +46,46 @@ class WebSocketHub {
       }
     }
 
-    // 2. If this process is a standalone CLI/worker, forward to the running ws-server if available
+    // 2. If this process is not the standalone ws-server (e.g. Next.js route handlers or CLI),
+    // forward to the running ws-server so all connected browser clients receive it
     if (!this.server) {
       this.forwardToStandaloneServer(payload);
     }
   }
 
+  private flushQueue(): void {
+    if (!this.uplinkSocket || this.uplinkSocket.readyState !== WebSocket.OPEN) return;
+    while (this.pendingQueue.length > 0) {
+      const msg = this.pendingQueue.shift();
+      if (msg) {
+        try {
+          this.uplinkSocket.send(msg);
+        } catch {
+          // If send fails, keep remaining
+          break;
+        }
+      }
+    }
+  }
+
   private forwardToStandaloneServer(payload: string): void {
-    const port = process.env.WS_PORT || '3001';
+    this.pendingQueue.push(payload);
+
     if (this.uplinkSocket && this.uplinkSocket.readyState === WebSocket.OPEN) {
-      this.uplinkSocket.send(payload);
+      this.flushQueue();
       return;
     }
 
     if (this.uplinkConnecting) return;
     this.uplinkConnecting = true;
 
+    const port = process.env.WS_PORT || '3001';
     try {
       const socket = new WebSocket(`ws://localhost:${port}`);
       socket.on('open', () => {
         this.uplinkSocket = socket;
         this.uplinkConnecting = false;
-        socket.send(payload);
+        this.flushQueue();
       });
       socket.on('error', () => {
         this.uplinkSocket = null;
