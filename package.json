@@ -1,0 +1,45 @@
+{
+  "name": "aerocut-engine",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "verify": "tsx scripts/verify-environment.ts",
+    "dev": "concurrently \"next dev\" \"tsx src/server/ws-server.ts\"",
+    "studio": "remotion studio",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.520",
+    "@remotion/cli": "4.0.520",
+    "@remotion/media-utils": "4.0.520",
+    "@remotion/player": "4.0.520",
+    "@remotion/renderer": "4.0.520",
+    "better-sqlite3": "^13.0.3",
+    "chokidar": "^5.0.0",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
+    "execa": "^10.0.1",
+    "lucide-react": "^1.41.0",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.520",
+    "tailwind-merge": "^3.6.0",
+    "ws": "^8.21.3",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
+    "concurrently": "^10.0.5",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.13",
+    "typescript": "^5"
+  },
+  "type": "module"
+}

@@ -1,0 +1,5 @@
+edge-tts>=7.2
+faster-whisper>=1.2
+soundfile>=0.13
+numpy>=2.0
+pydantic>=2.11

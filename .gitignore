@@ -1,0 +1,51 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# Python venv
+venv/
+**/venv/
+__pycache__/
+*.pyc
+
+# AeroCut asset pipelines
+assets/processed/*
+!assets/processed/.gitkeep
+assets/output/*
+!assets/output/.gitkeep
+assets/raw/*
+!assets/raw/.gitkeep
+
+# Logs and SQLite databases
+logs/*
+!logs/.gitkeep
+*.log
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Environment files
+.env
+.env*.local
+!.env.example
+
+# Misc & debug
+.DS_Store
+*.pem
+*.tsbuildinfo
+next-env.d.ts
+.vercel
