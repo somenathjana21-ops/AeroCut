@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "verify": "tsx scripts/verify-environment.ts",
+    "test:audio": "tsx scripts/test-audio-pipeline.ts",
     "dev": "concurrently \"next dev\" \"tsx src/server/ws-server.ts\"",
     "studio": "remotion studio",
     "build": "next build",
