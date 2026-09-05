@@ -78,6 +78,7 @@ def main():
 
         words = []
         segment_texts = []
+        last_start = 0.0
         for s in segments:
             if s.text:
                 segment_texts.append(s.text.strip())
@@ -85,10 +86,14 @@ def main():
                 for w in s.words:
                     word_token = w.word.strip()
                     if word_token:
+                        raw_start = max(0.0, round(float(w.start), 3))
+                        w_start = max(last_start, raw_start)
+                        w_end = max(w_start + 0.01, round(float(w.end), 3))
+                        last_start = w_start
                         words.append({
                             "word": word_token,
-                            "start": round(float(w.start), 3),
-                            "end": round(float(w.end), 3)
+                            "start": w_start,
+                            "end": w_end
                         })
 
         full_text = " ".join(segment_texts).strip()
@@ -100,6 +105,9 @@ def main():
                 duration_sec = round(float(file_info.duration), 3)
             except Exception:
                 pass
+
+        if duration_sec <= 0.0 and len(words) > 0:
+            duration_sec = round(float(words[-1]["end"]), 3)
 
         result = {
             "durationSec": duration_sec,

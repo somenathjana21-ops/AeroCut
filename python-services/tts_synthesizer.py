@@ -37,6 +37,8 @@ async def synthesize_tts(payload: dict) -> dict:
 
         # 2. Read audio data for silence trimming
         data, sample_rate = sf.read(tmp_path)
+        if len(data) == 0:
+            raise ValueError("Synthesized audio file is empty (0 samples)")
 
         # 3. Detect first sample above -45 dBFS threshold
         # dBFS formula: 20 * log10(|sample|) >= -45  =>  |sample| >= 10 ** (-45 / 20)
@@ -54,6 +56,7 @@ async def synthesize_tts(payload: dict) -> dict:
         else:
             trim_sample_index = 0
 
+        trim_sample_index = min(trim_sample_index, max(0, len(data) - 1))
         trimmed_ms = float((trim_sample_index / sample_rate) * 1000.0)
         trimmed_data = data[trim_sample_index:]
 

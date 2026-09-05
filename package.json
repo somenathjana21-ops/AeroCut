@@ -5,6 +5,7 @@
   "scripts": {
     "verify": "tsx scripts/verify-environment.ts",
     "test:audio": "tsx scripts/test-audio-pipeline.ts",
+    "test:render": "tsx scripts/test-render.ts",
     "dev": "concurrently \"next dev\" \"tsx src/server/ws-server.ts\"",
     "studio": "remotion studio",
     "build": "next build",

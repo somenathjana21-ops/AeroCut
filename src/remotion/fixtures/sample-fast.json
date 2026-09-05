@@ -1,0 +1,114 @@
+{
+  "jobId": "fixture-fast-001",
+  "mode": "fast",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "durationInFrames": 360,
+  "scenes": [
+    {
+      "beatIndex": 0,
+      "archetype": "TitleCard",
+      "startFrame": 0,
+      "durationInFrames": 60,
+      "text": "99% OF DEVS GET THIS WRONG",
+      "energy": 9,
+      "transitionIn": "impact",
+      "kenBurns": {
+        "fromScale": 1.15,
+        "toScale": 1.0,
+        "fromX": 0,
+        "fromY": 0
+      }
+    },
+    {
+      "beatIndex": 1,
+      "archetype": "KineticText",
+      "startFrame": 60,
+      "durationInFrames": 75,
+      "text": "REACT RE-RENDERS ARE NOT EXPENSIVE",
+      "energy": 8,
+      "transitionIn": "whoosh",
+      "kenBurns": {
+        "fromScale": 1.0,
+        "toScale": 1.06,
+        "fromX": -10,
+        "fromY": 5
+      }
+    },
+    {
+      "beatIndex": 2,
+      "archetype": "SplitCompare",
+      "startFrame": 135,
+      "durationInFrames": 75,
+      "text": "Virtual DOM vs DOM Mutations",
+      "energy": 7,
+      "transitionIn": "cut"
+    },
+    {
+      "beatIndex": 3,
+      "archetype": "DiagramStep",
+      "startFrame": 210,
+      "durationInFrames": 75,
+      "text": "Batch Updates Settle Cleanly",
+      "energy": 8,
+      "transitionIn": "whoosh"
+    },
+    {
+      "beatIndex": 4,
+      "archetype": "Outro",
+      "startFrame": 285,
+      "durationInFrames": 75,
+      "text": "OPTIMIZE WHAT ACTUALLY MATTERS",
+      "energy": 9,
+      "transitionIn": "impact"
+    }
+  ],
+  "words": [
+    { "word": "Ninety", "start": 0.0, "end": 0.35, "beatIndex": 0 },
+    { "word": "nine", "start": 0.35, "end": 0.65, "beatIndex": 0 },
+    { "word": "percent", "start": 0.65, "end": 1.05, "beatIndex": 0 },
+    { "word": "of", "start": 1.05, "end": 1.18, "beatIndex": 0 },
+    { "word": "developers", "start": 1.18, "end": 1.6, "beatIndex": 0 },
+    { "word": "get", "start": 1.6, "end": 1.8, "beatIndex": 0 },
+    { "word": "this", "start": 1.8, "end": 1.95, "beatIndex": 0 },
+    { "word": "completely", "start": 2.05, "end": 2.5, "beatIndex": 1 },
+    { "word": "wrong.", "start": 2.5, "end": 2.9, "beatIndex": 1 },
+    { "word": "Component", "start": 3.0, "end": 3.45, "beatIndex": 1 },
+    { "word": "re-renders", "start": 3.45, "end": 3.95, "beatIndex": 1 },
+    { "word": "are", "start": 3.95, "end": 4.1, "beatIndex": 1 },
+    { "word": "cheap,", "start": 4.1, "end": 4.45, "beatIndex": 1 },
+    { "word": "it", "start": 4.6, "end": 4.75, "beatIndex": 2 },
+    { "word": "is", "start": 4.75, "end": 4.9, "beatIndex": 2 },
+    { "word": "the", "start": 4.9, "end": 5.05, "beatIndex": 2 },
+    { "word": "heavy", "start": 5.05, "end": 5.4, "beatIndex": 2 },
+    { "word": "DOM", "start": 5.4, "end": 5.75, "beatIndex": 2 },
+    { "word": "mutations", "start": 5.75, "end": 6.35, "beatIndex": 2 },
+    { "word": "that", "start": 6.35, "end": 6.55, "beatIndex": 2 },
+    { "word": "lag.", "start": 6.55, "end": 6.95, "beatIndex": 2 },
+    { "word": "Batch", "start": 7.1, "end": 7.45, "beatIndex": 3 },
+    { "word": "state", "start": 7.45, "end": 7.8, "beatIndex": 3 },
+    { "word": "updates", "start": 7.8, "end": 8.35, "beatIndex": 3 },
+    { "word": "together", "start": 8.35, "end": 8.85, "beatIndex": 3 },
+    { "word": "and", "start": 8.85, "end": 9.05, "beatIndex": 3 },
+    { "word": "measure.", "start": 9.05, "end": 9.45, "beatIndex": 3 },
+    { "word": "Stop", "start": 9.6, "end": 9.9, "beatIndex": 4 },
+    { "word": "guessing", "start": 9.9, "end": 10.4, "beatIndex": 4 },
+    { "word": "and", "start": 10.4, "end": 10.6, "beatIndex": 4 },
+    { "word": "profile", "start": 10.6, "end": 11.1, "beatIndex": 4 },
+    { "word": "first.", "start": 11.1, "end": 11.6, "beatIndex": 4 }
+  ],
+  "audio": {
+    "voicePath": "",
+    "musicGainDb": -8,
+    "duckToDb": -18,
+    "sfx": []
+  },
+  "theme": {
+    "background": "#0A0A0B",
+    "foreground": "#FAFAFA",
+    "accent": "#4F8CFF",
+    "fontFamily": "Inter",
+    "monoFontFamily": "JetBrains Mono"
+  }
+}

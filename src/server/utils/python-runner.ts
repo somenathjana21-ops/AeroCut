@@ -24,6 +24,11 @@ export async function runPython<T>(scriptPath: string, payload: unknown): Promis
     ? scriptPath
     : path.resolve(process.cwd(), scriptPath);
 
+  const allowedDir = path.resolve(process.cwd(), 'python-services');
+  if (!script.startsWith(allowedDir)) {
+    throw new Error(`Forbidden script path outside python-services: ${scriptPath}`);
+  }
+
   if (!fs.existsSync(script)) {
     throw new Error(`Python script not found at ${script}`);
   }
@@ -46,10 +51,11 @@ export async function runPython<T>(scriptPath: string, payload: unknown): Promis
     stdout = result.stdout;
     stderr = result.stderr;
   } catch (err: any) {
+    const isTimeout = err.timedOut ? ' (Timed out after 120s)' : '';
     const outSnippet = (err.stdout ?? stdout ?? '').slice(0, 500);
     const errSnippet = (err.stderr ?? stderr ?? err.message ?? '').slice(0, 500);
     throw new Error(
-      `Python execution failed for ${scriptPath}: ${err.message}\n` +
+      `Python execution failed for ${scriptPath}${isTimeout}: ${err.message}\n` +
       `Stdout (first 500 chars):\n${outSnippet}\n` +
       `Stderr (first 500 chars):\n${errSnippet}`
     );
